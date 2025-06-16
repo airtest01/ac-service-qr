@@ -60,8 +60,8 @@
             .then((docRef) => {
                 console.log("สร้างเอกสารใหม่สำเร็จ ID คือ: ", docRef.id);
                 
-                // --- ⭐⭐⭐ จุดที่แก้ไขล่าสุด! ⭐⭐⭐
-                // อัปเดตเป็น URL จริงที่ถูกต้องของคุณ
+                // --- ⭐⭐⭐ จุดที่แก้ไข! ⭐⭐⭐
+                // แก้จาก airtestO1 (ตัวโอ) เป็น airtest01 (เลขศูนย์)
                 const baseUrl = 'https://airtest01.netlify.app';
                 const fullUrl = `${baseUrl}/index.html?id=${docRef.id}`;
                 
