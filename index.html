@@ -33,8 +33,6 @@
         .login-form input { width: 100%; padding: 12px 15px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1em; font-family: 'Kanit', sans-serif; }
         .login-form input:focus { outline: none; border-color: var(--gradient-end); box-shadow: 0 0 0 3px rgba(178, 235, 242, 0.5); }
         .login-form button { padding: 12px 20px; border: none; background-color: #343a40; color: white; border-radius: 8px; cursor: pointer; font-family: 'Kanit', sans-serif; }
-        
-        /* --- สไตล์สำหรับฟอร์มแก้ไข --- */
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #4A5568; }
         .form-input { width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1em; font-family: 'Kanit', sans-serif; box-sizing: border-box; }
@@ -46,23 +44,14 @@
     </style>
 </head>
 <body>
-
     <div class="container">
-        <header class="shop-header">
-            <h1>ร้านแอร์เซอร์วิส สบายใจ</h1>
-            <p>ติดต่อช่าง: 081-234-5678</p>
-        </header>
-
+        <header class="shop-header"><h1>ร้านแอร์เซอร์วิส สบายใจ</h1><p>ติดต่อช่าง: 081-234-5678</p></header>
         <div class="countdown-highlight">
             <h2 id="target-date-display">กำลังโหลดข้อมูล...</h2>
             <p class="countdown-subtitle">เหลือเวลาอีก</p>
-            <div id="countdown-timer">
-                <span id="days" class="digit">--</span>
-                <span class="label">วัน</span>
-            </div>
+            <div id="countdown-timer"><span id="days" class="digit">--</span><span class="label">วัน</span></div>
             <div id="message-area"></div>
         </div>
-
         <div class="main-content">
             <div id="view-mode-content">
                 <div class="section">
@@ -75,7 +64,6 @@
                     <div class="info-item" id="warranty-info"><p>ประกันงานซ่อมหมดอายุ: กำลังโหลด...</p></div>
                 </div>
             </div>
-
             <div class="admin-section">
                 <h3>สำหรับเจ้าหน้าที่</h3>
                 <div class="login-form">
@@ -83,7 +71,6 @@
                     <button id="edit-btn">แก้ไข</button>
                 </div>
             </div>
-
             <div id="edit-mode-form" style="display: none;">
                 <div class="section">
                     <h3>โหมดแก้ไขข้อมูล</h3>
@@ -106,6 +93,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
     <script>
         const firebaseConfig = {
           apiKey: "AIzaSyDaSUB2YOUhTcUXcvD7UkBHBfnD7VvihFI",
@@ -150,10 +138,8 @@
                 document.querySelector('.countdown-subtitle').style.display = 'block';
                 document.getElementById('countdown-timer').style.display = 'flex';
                 messageArea.style.display = 'none';
-
                 const formattedThaiDate = thaiDateFormatter.format(targetDate);
                 document.getElementById('target-date-display').innerText = `นัดครั้งต่อไป: ${formattedThaiDate}`;
-                
                 countdownInterval = setInterval(() => {
                     const now = new Date().getTime();
                     const distance = targetDate.getTime() - now;
@@ -172,7 +158,8 @@
             }
             
             if (acId) {
-                db.collection('AirConditioners').doc(acId).get().then((doc) => {
+                const docRef = db.collection('AirConditioners').doc(acId);
+                docRef.get().then((doc) => {
                     if (doc.exists) {
                         currentAcData = doc.data();
                         displayData(currentAcData);
@@ -200,12 +187,11 @@
 
             editBtn.addEventListener('click', () => {
                 if (passwordInput.value === CORRECT_PASSWORD) {
-                    if (currentAcData.lastServiceDate) { document.getElementById('last-service-date').valueAsDate = currentAcData.lastServiceDate.toDate(); }
-                    if (currentAcData.nextServiceDate) { document.getElementById('next-service-date').valueAsDate = currentAcData.nextServiceDate.toDate(); }
-                    if (currentAcData.warrantyDate) { document.getElementById('warranty-date').valueAsDate = currentAcData.warrantyDate.toDate(); }
+                    if (currentAcData.lastServiceDate) { document.getElementById('last-service-date').valueAsDate = currentAcData.lastServiceDate.toDate(); } else { document.getElementById('last-service-date').value = ''; }
+                    if (currentAcData.nextServiceDate) { document.getElementById('next-service-date').valueAsDate = currentAcData.nextServiceDate.toDate(); } else { document.getElementById('next-service-date').value = ''; }
+                    if (currentAcData.warrantyDate) { document.getElementById('warranty-date').valueAsDate = currentAcData.warrantyDate.toDate(); } else { document.getElementById('warranty-date').value = ''; }
                     document.getElementById('service-type').value = currentAcData.serviceType || 'ล้างแอร์';
                     document.getElementById('service-details').value = currentAcData.serviceDetails || '';
-                    
                     viewModeContent.style.display = 'none';
                     adminSection.style.display = 'none';
                     editModeForm.style.display = 'block';
@@ -224,7 +210,6 @@
                 const lastServiceDateValue = document.getElementById('last-service-date').value;
                 const warrantyDateValue = document.getElementById('warranty-date').value;
                 const nextServiceDateValue = document.getElementById('next-service-date').value;
-
                 const updatedData = {
                     serviceType: document.getElementById('service-type').value,
                     serviceDetails: document.getElementById('service-details').value,
@@ -233,11 +218,10 @@
                     nextServiceDate: nextServiceDateValue ? new Date(nextServiceDateValue) : null,
                     lastUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
-
                 saveBtn.disabled = true;
                 saveBtn.innerText = 'กำลังบันทึก...';
-
-                db.collection('AirConditioners').doc(acId).update(updatedData)
+                
+                db.collection('AirConditioners').doc(acId).set(updatedData, { merge: true })
                     .then(() => {
                         alert('บันทึกข้อมูลเรียบร้อย!');
                         currentAcData = { ...currentAcData, ...updatedData };
@@ -245,11 +229,9 @@
                         if (updatedData.nextServiceDate) {
                             startCountdown(updatedData.nextServiceDate);
                         }
-                        
                         editModeForm.style.display = 'none';
                         viewModeContent.style.display = 'block';
                         adminSection.style.display = 'block';
-                        
                         saveBtn.disabled = false;
                         saveBtn.innerText = 'บันทึกข้อมูล';
                     })
