@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AC Service - ข้อมูลบริการ</title>
+    <title>เฟื่องฟูAIR - ข้อมูลบริการ</title>
     <style>
+        /* CSS ทั้งหมดเหมือนเดิม */
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;700;800&display=swap');
         :root {
             --gradient-start: #E0F7FA; --gradient-end: #B2EBF2; --primary-color: #00796B;
@@ -45,7 +46,10 @@
 </head>
 <body>
     <div class="container">
-        <header class="shop-header"><h1>ร้านแอร์เซอร์วิส สบายใจ</h1><p>ติดต่อช่าง: 081-234-5678</p></header>
+        <header class="shop-header">
+            <h1>เฟื่องฟูAIR</h1>
+            <p>ช่างหนุ่ม 089-0811181</p>
+        </header>
         <div class="countdown-highlight">
             <h2 id="target-date-display">กำลังโหลดข้อมูล...</h2>
             <p class="countdown-subtitle">เหลือเวลาอีก</p>
@@ -80,7 +84,7 @@
                     <div class="form-group"><label for="warranty-date">วันหมดเขตประกัน (ถ้ามี)</label><input type="date" id="warranty-date" class="form-input"></div>
                 </div>
                 <div class="section" style="background-color: #e0f2f1; padding: 15px; border-radius: 8px;">
-                    <h3 style="color: #00796B;">กำหนดนัดหมายครั้งถัดไป (สำคัญ)</h3>
+                    <h3 style="color: #00796B;">กำหนดนัดล้างครั้งต่อไป (สำคัญ)</h3>
                     <div class="form-group"><label for="next-service-date">เลือกวันที่นัดครั้งถัดไป</label><input type="date" id="next-service-date" class="form-input"></div>
                 </div>
                 <div class="form-actions">
@@ -108,7 +112,7 @@
         const db = firebase.firestore();
 
         document.addEventListener('DOMContentLoaded', () => {
-            const CORRECT_PASSWORD = '1234';
+            const CORRECT_PASSWORD = 'num1181';
             let currentAcData = {};
             let countdownInterval;
             const params = new URLSearchParams(window.location.search);
@@ -139,7 +143,7 @@
                 document.getElementById('countdown-timer').style.display = 'flex';
                 messageArea.style.display = 'none';
                 const formattedThaiDate = thaiDateFormatter.format(targetDate);
-                document.getElementById('target-date-display').innerText = `นัดครั้งต่อไป: ${formattedThaiDate}`;
+                document.getElementById('target-date-display').innerText = `นัดล้างครั้งต่อไป: ${formattedThaiDate}`;
                 countdownInterval = setInterval(() => {
                     const now = new Date().getTime();
                     const distance = targetDate.getTime() - now;
@@ -238,7 +242,7 @@
                     })
                     .catch((error) => {
                         console.error("เกิดข้อผิดพลาดในการบันทึก: ", error);
-                        alert("เกิดข้อผิดพลาด! ไม่สามารถบันทึกข้อมูลได้");
+                        alert(`เกิดข้อผิดพลาด! ไม่สามารถบันทึกข้อมูลได้\n\nสาเหตุ: ${error.message}`);
                         saveBtn.disabled = false;
                         saveBtn.innerText = 'บันทึกข้อมูล';
                     });
