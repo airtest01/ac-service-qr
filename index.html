@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AC Service - ข้อมูลบริการ</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;700;800&display=swap');
+        :root {
+            --gradient-start: #E0F7FA; --gradient-end: #B2EBF2; --primary-color: #00796B;
+            --background-color: #F7FAFC; --card-color: #FFFFFF; --primary-text: #2D3748;
+            --secondary-text: #718096;
+        }
+        body { font-family: 'Kanit', sans-serif; background-color: var(--background-color); margin: 0; padding: 20px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
+        .container { background-color: var(--card-color); width: 100%; max-width: 420px; border-radius: 24px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07); overflow: hidden; }
+        .shop-header { padding: 20px 25px; border-bottom: 1px solid #E8F0F2; text-align: center; }
+        .shop-header h1 { margin: 0 0 5px 0; font-size: 1.4em; font-weight: 700; color: var(--primary-text); }
+        .shop-header p { margin: 0; font-size: 1em; font-weight: 500; color: var(--primary-color); }
+        .countdown-highlight { background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); color: var(--primary-color); padding: 25px; text-align: center; min-height: 150px; }
+        #target-date-display { margin: 0 0 15px 0; font-size: 1.4em; font-weight: 700; color: var(--primary-color); }
+        .countdown-subtitle { margin: 0 0 5px 0; font-size: 0.9em; font-weight: 400; opacity: 0.8; }
+        #countdown-timer { display: flex; align-items: baseline; justify-content: center; gap: 10px; }
+        #countdown-timer .digit { font-size: 2.8em; font-weight: 800; line-height: 1; }
+        #countdown-timer .label { font-size: 1.2em; font-weight: 500; padding-bottom: 4px; }
+        #message-area { font-size: 1.5em; font-weight: 700; display: none; }
+        .main-content { padding: 25px; text-align: left; }
+        .section h3 { font-size: 1.2em; font-weight: 700; color: var(--primary-text); margin: 0 0 15px 0; border-bottom: 2px solid var(--gradient-end); padding-bottom: 5px; }
+        .info-item { padding: 12px 0; }
+        .info-item p { margin: 0; color: var(--secondary-text); font-size: 0.95em; }
+        .info-item p strong { color: var(--primary-text); font-weight: 500; }
+        .admin-section { margin-top: 25px; padding-top: 20px; }
+        .login-form { display: flex; gap: 10px; }
+        .login-form input { width: 100%; padding: 12px 15px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1em; font-family: 'Kanit', sans-serif; }
+        .login-form input:focus { outline: none; border-color: var(--gradient-end); box-shadow: 0 0 0 3px rgba(178, 235, 242, 0.5); }
+        .login-form button { padding: 12px 20px; border: none; background-color: #343a40; color: white; border-radius: 8px; cursor: pointer; font-family: 'Kanit', sans-serif; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #4A5568; }
+        .form-input { width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1em; font-family: 'Kanit', sans-serif; box-sizing: border-box; }
+        .form-actions { margin-top: 25px; display: flex; gap: 10px; }
+        .action-btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 1.1em; font-family: 'Kanit', sans-serif; font-weight: 500; cursor: pointer; transition: all 0.2s ease-in-out; }
+        .action-btn.save { background-color: #28a745; color: white; }
+        .action-btn.cancel { background-color: #6c757d; color: white; }
+        .action-btn:disabled { background-color: #cccccc; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="shop-header">
+            <h1>ร้านแอร์เซอร์วิส สบายใจ</h1>
+            <p>ติดต่อช่าง: 081-234-5678</p>
+        </header>
+
+        <div class="countdown-highlight">
+            <h2 id="target-date-display">กำลังโหลดข้อมูล...</h2>
+            <p class="countdown-subtitle">เหลือเวลาอีก</p>
+            <div id="countdown-timer">
+                <span id="days" class="digit">--</span>
+                <span class="label">วัน</span>
+            </div>
+            <div id="message-area"></div>
+        </div>
+
+        <div class="main-content">
+            <div id="view-mode-content">
+                <div class="section">
+                    <h3>สถานะล่าสุด</h3>
+                    <div class="info-item" id="last-service-info"><p><strong>ล้างล่าสุดเมื่อ:</strong> กำลังโหลด...</p></div>
+                    <div class="info-item" id="last-repair-info"><p><strong>รายการซ่อมล่าสุด:</strong> กำลังโหลด...</p></div>
+                </div>
+                <div class="section">
+                    <h3>ข้อมูลประกัน</h3>
+                    <div class="info-item" id="warranty-info"><p>ประกันงานซ่อมหมดอายุ: กำลังโหลด...</p></div>
+                </div>
+            </div>
+
+            <div class="admin-section">
+                <h3>สำหรับเจ้าหน้าที่</h3>
+                <div class="login-form">
+                    <input id="password-input" type="password" placeholder="รหัสผ่านสำหรับช่าง">
+                    <button id="edit-btn">แก้ไข</button>
+                </div>
+            </div>
+
+            <div id="edit-mode-form" style="display: none;">
+                <div class="section">
+                    <h3>โหมดแก้ไขข้อมูล</h3>
+                    <div class="form-group"><label for="service-type">ประเภทบริการ</label><select id="service-type" class="form-input"><option value="ล้างแอร์">ล้างแอร์</option><option value="ซ่อม">ซ่อม</option><option value="ติดตั้ง">ติดตั้ง</option></select></div>
+                    <div class="form-group"><label for="last-service-date">วันที่เข้ารับบริการล่าสุด</label><input type="date" id="last-service-date" class="form-input"></div>
+                    <div class="form-group"><label for="service-details">รายละเอียดการบริการ</label><textarea id="service-details" rows="3" class="form-input" placeholder="เช่น ล้างใหญ่, เติมน้ำยา R32"></textarea></div>
+                    <div class="form-group"><label for="warranty-date">วันหมดเขตประกัน (ถ้ามี)</label><input type="date" id="warranty-date" class="form-input"></div>
+                </div>
+                <div class="section" style="background-color: #e0f2f1; padding: 15px; border-radius: 8px;">
+                    <h3 style="color: #00796B;">กำหนดนัดหมายครั้งถัดไป (สำคัญ)</h3>
+                    <div class="form-group"><label for="next-service-date">เลือกวันที่นัดครั้งถัดไป</label><input type="date" id="next-service-date" class="form-input"></div>
+                </div>
+                <div class="form-actions">
+                    <button id="save-btn" class="action-btn save">บันทึกข้อมูล</button>
+                    <button id="cancel-btn" class="action-btn cancel">ยกเลิก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyDaSUB2YOUhTcUXcvD7UkBHBfnD7VvihFI",
+          authDomain: "airtest-a5426.firebaseapp.com",
+          projectId: "airtest-a5426",
+          storageBucket: "airtest-a5426.appspot.com",
+          messagingSenderId: "960699518397",
+          appId: "1:960699518397:web:cf32a0c1694076986ad6d4",
+          measurementId: "G-K0FLKYTMZ9"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const CORRECT_PASSWORD = '1234';
+            let currentAcData = {};
+            let countdownInterval;
+            const params = new URLSearchParams(window.location.search);
+            const acId = params.get('id');
+
+            const messageArea = document.getElementById('message-area');
+            const viewModeContent = document.getElementById('view-mode-content');
+            const adminSection = document.querySelector('.admin-section');
+            const editModeForm = document.getElementById('edit-mode-form');
+            const passwordInput = document.getElementById('password-input');
+            const editBtn = document.getElementById('edit-btn');
+            const saveBtn = document.getElementById('save-btn');
+            const cancelBtn = document.getElementById('cancel-btn');
+            const thaiDateFormatter = new Intl.DateTimeFormat('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            function displayData(data) {
+                const lastServiceDate = data.lastServiceDate ? data.lastServiceDate.toDate() : null;
+                const warrantyDate = data.warrantyDate ? data.warrantyDate.toDate() : null;
+                document.getElementById('last-service-info').innerHTML = `<p><strong>ล้างล่าสุดเมื่อ:</strong> ${lastServiceDate ? thaiDateFormatter.format(lastServiceDate) : 'ยังไม่มีข้อมูล'}</p>`;
+                document.getElementById('last-repair-info').innerHTML = `<p><strong>รายการซ่อมล่าสุด:</strong> ${data.serviceDetails || 'ยังไม่มีข้อมูล'}</p>`;
+                document.getElementById('warranty-info').innerHTML = `<p>ประกันงานซ่อมหมดอายุ: ${warrantyDate ? thaiDateFormatter.format(warrantyDate) : 'ไม่มี'}</p>`;
+            }
+
+            function startCountdown(targetDate) {
+                clearInterval(countdownInterval);
+                document.getElementById('target-date-display').style.display = 'block';
+                document.querySelector('.countdown-subtitle').style.display = 'block';
+                document.getElementById('countdown-timer').style.display = 'flex';
+                messageArea.style.display = 'none';
+
+                const formattedThaiDate = thaiDateFormatter.format(targetDate);
+                document.getElementById('target-date-display').innerText = `นัดครั้งต่อไป: ${formattedThaiDate}`;
+                
+                countdownInterval = setInterval(() => {
+                    const now = new Date().getTime();
+                    const distance = targetDate.getTime() - now;
+                    if (distance > 0) {
+                        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                        document.getElementById('days').innerText = (days < 10 ? '0' : '') + days;
+                    } else {
+                        clearInterval(countdownInterval);
+                        document.getElementById('countdown-timer').style.display = 'none';
+                        document.querySelector('.countdown-subtitle').style.display = 'none';
+                        document.getElementById('target-date-display').style.display = 'none';
+                        messageArea.innerText = 'ถึงกำหนดล้างแอร์แล้ว!';
+                        messageArea.style.display = 'block';
+                    }
+                }, 1000);
+            }
+            
+            if (acId) {
+                db.collection('AirConditioners').doc(acId).get().then((doc) => {
+                    if (doc.exists) {
+                        currentAcData = doc.data();
+                        displayData(currentAcData);
+                        if (currentAcData.nextServiceDate) {
+                            startCountdown(currentAcData.nextServiceDate.toDate());
+                        } else {
+                            messageArea.innerText = 'ยังไม่ได้กำหนดวันล้างแอร์ครั้งถัดไป';
+                            messageArea.style.display = 'block';
+                            document.getElementById('countdown-timer').style.display = 'none';
+                            document.querySelector('.countdown-subtitle').style.display = 'none';
+                        }
+                    } else { /* ... */ }
+                }).catch((error) => { /* ... */ });
+            } else { /* ... */ }
+
+            editBtn.addEventListener('click', () => {
+                if (passwordInput.value === CORRECT_PASSWORD) {
+                    if (currentAcData.lastServiceDate) { document.getElementById('last-service-date').valueAsDate = currentAcData.lastServiceDate.toDate(); }
+                    if (currentAcData.nextServiceDate) { document.getElementById('next-service-date').valueAsDate = currentAcData.nextServiceDate.toDate(); }
+                    if (currentAcData.warrantyDate) { document.getElementById('warranty-date').valueAsDate = currentAcData.warrantyDate.toDate(); }
+                    document.getElementById('service-type').value = currentAcData.serviceType || 'ล้างแอร์';
+                    document.getElementById('service-details').value = currentAcData.serviceDetails || '';
+                    
+                    viewModeContent.style.display = 'none';
+                    adminSection.style.display = 'none';
+                    editModeForm.style.display = 'block';
+                } else {
+                    alert('รหัสผ่านไม่ถูกต้อง!');
+                }
+            });
+
+            cancelBtn.addEventListener('click', () => {
+                editModeForm.style.display = 'none';
+                viewModeContent.style.display = 'block';
+                adminSection.style.display = 'block';
+            });
+
+            saveBtn.addEventListener('click', () => {
+                const updatedData = {
+                    serviceType: document.getElementById('service-type').value,
+                    lastServiceDate: new Date(document.getElementById('last-service-date').value),
+                    serviceDetails: document.getElementById('service-details').value,
+                    warrantyDate: new Date(document.getElementById('warranty-date').value),
+                    nextServiceDate: new Date(document.getElementById('next-service-date').value),
+                    lastUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                saveBtn.disabled = true;
+                saveBtn.innerText = 'กำลังบันทึก...';
+
+                db.collection('AirConditioners').doc(acId).update(updatedData)
+                    .then(() => {
+                        alert('บันทึกข้อมูลเรียบร้อย!');
+                        currentAcData = { ...currentAcData, ...updatedData };
+                        displayData(currentAcData);
+                        startCountdown(updatedData.nextServiceDate);
+
+                        editModeForm.style.display = 'none';
+                        viewModeContent.style.display = 'block';
+                        adminSection.style.display = 'block';
+                        
+                        saveBtn.disabled = false;
+                        saveBtn.innerText = 'บันทึกข้อมูล';
+                    })
+                    .catch((error) => {
+                        console.error("เกิดข้อผิดพลาดในการบันทึก: ", error);
+                        alert("เกิดข้อผิดพลาด! ไม่สามารถบันทึกข้อมูลได้");
+                        saveBtn.disabled = false;
+                        saveBtn.innerText = 'บันทึกข้อมูล';
+                    });
+            });
+        });
+    </script>
+</body>
+</html>

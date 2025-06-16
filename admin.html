@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - สร้าง QR Code</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;700&display=swap');
+        body { font-family: 'Kanit', sans-serif; background-color: #F7FAFC; display: flex; justify-content: center; align-items: center; min-height: 100vh; text-align: center; margin: 20px; }
+        .admin-panel { background-color: #FFFFFF; padding: 40px; border-radius: 20px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1); width: 100%; max-width: 450px; }
+        h1 { color: #2D3748; margin-bottom: 30px; }
+        #generate-btn { background: #00796B; color: white; border: none; padding: 15px 30px; font-size: 1.1em; font-family: 'Kanit', sans-serif; border-radius: 10px; cursor: pointer; transition: all 0.3s ease; }
+        #generate-btn:hover { background: #004D40; transform: translateY(-3px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        #qrcode-container { margin-top: 30px; padding: 20px; min-height: 256px; display: flex; justify-content: center; align-items: center; }
+        #result-url { margin-top: 15px; font-size: 0.9em; color: #718096; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-panel">
+        <h1>ระบบสร้าง QR Code</h1>
+        <p>กดปุ่มเพื่อสร้าง QR Code สำหรับแอร์เครื่องใหม่</p>
+        <button id="generate-btn">สร้าง QR Code ใหม่</button>
+        <div id="qrcode-container"></div>
+        <p id="result-url"></p>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <script>
+        // --- 1. การตั้งค่า FIREBASE (ของคุณ) ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyDaSUB2YOUhTcUXcvD7UkBHBfnD7VvihFI",
+          authDomain: "airtest-a5426.firebaseapp.com",
+          projectId: "airtest-a5426",
+          storageBucket: "airtest-a5426.appspot.com",
+          messagingSenderId: "960699518397",
+          appId: "1:960699518397:web:cf32a0c1694076986ad6d4",
+          measurementId: "G-K0FLKYTMZ9"
+        };
+
+        // เริ่มต้นการเชื่อมต่อกับ Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // --- 2. เชื่อมโค้ดกับปุ่มและพื้นที่แสดงผล ---
+        const generateBtn = document.getElementById('generate-btn');
+        const qrcodeContainer = document.getElementById('qrcode-container');
+        const resultUrlElement = document.getElementById('result-url');
+
+        // --- 3. สั่งให้ปุ่มทำงานเมื่อถูกคลิก ---
+        generateBtn.addEventListener('click', () => {
+            // นี่คือบรรทัดที่เราเพิ่มเข้ามาเพื่อทดสอบ
+            console.log("ปุ่มถูกกดแล้ว!"); 
+
+            generateBtn.disabled = true;
+            generateBtn.innerText = 'กำลังสร้าง...';
+            qrcodeContainer.innerHTML = '';
+            resultUrlElement.innerText = '';
+            
+            db.collection('AirConditioners').add({
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then((docRef) => {
+                console.log("สร้างเอกสารใหม่สำเร็จ ID คือ: ", docRef.id);
+                
+                const baseUrl = 'https://your-future-app-name.vercel.app';
+                const fullUrl = `${baseUrl}/ac.html?id=${docRef.id}`;
+                
+                new QRCode(qrcodeContainer, {
+                    text: fullUrl,
+                    width: 256,
+                    height: 256,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+
+                resultUrlElement.innerText = `URL: ${fullUrl}`;
+                generateBtn.disabled = false;
+                generateBtn.innerText = 'สร้าง QR Code ใหม่';
+            })
+            .catch((error) => {
+                console.error("เกิดข้อผิดพลาด: ", error);
+                alert("เกิดข้อผิดพลาดในการสร้าง QR Code!");
+                generateBtn.disabled = false;
+                generateBtn.innerText = 'สร้าง QR Code ใหม่';
+            });
+        });
+    </script>
+
+</body>
+</html>
