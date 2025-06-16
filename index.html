@@ -34,6 +34,7 @@
         .login-form input:focus { outline: none; border-color: var(--gradient-end); box-shadow: 0 0 0 3px rgba(178, 235, 242, 0.5); }
         .login-form button { padding: 12px 20px; border: none; background-color: #343a40; color: white; border-radius: 8px; cursor: pointer; font-family: 'Kanit', sans-serif; }
         
+        /* --- สไตล์สำหรับฟอร์มแก้ไข --- */
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #4A5568; }
         .form-input { width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1em; font-family: 'Kanit', sans-serif; box-sizing: border-box; }
@@ -183,9 +184,19 @@
                             document.getElementById('countdown-timer').style.display = 'none';
                             document.querySelector('.countdown-subtitle').style.display = 'none';
                         }
-                    } else { /* ... */ }
-                }).catch((error) => { /* ... */ });
-            } else { /* ... */ }
+                    } else {
+                        messageArea.innerText = 'ไม่พบข้อมูลของ QR Code นี้';
+                        messageArea.style.display = 'block';
+                    }
+                }).catch((error) => {
+                    console.error("Error getting document:", error);
+                    messageArea.innerText = 'เกิดข้อผิดพลาดในการโหลดข้อมูล';
+                    messageArea.style.display = 'block';
+                });
+            } else {
+                messageArea.innerText = 'QR Code ไม่ถูกต้อง';
+                messageArea.style.display = 'block';
+            }
 
             editBtn.addEventListener('click', () => {
                 if (passwordInput.value === CORRECT_PASSWORD) {
@@ -210,12 +221,16 @@
             });
 
             saveBtn.addEventListener('click', () => {
+                const lastServiceDateValue = document.getElementById('last-service-date').value;
+                const warrantyDateValue = document.getElementById('warranty-date').value;
+                const nextServiceDateValue = document.getElementById('next-service-date').value;
+
                 const updatedData = {
                     serviceType: document.getElementById('service-type').value,
-                    lastServiceDate: new Date(document.getElementById('last-service-date').value),
                     serviceDetails: document.getElementById('service-details').value,
-                    warrantyDate: new Date(document.getElementById('warranty-date').value),
-                    nextServiceDate: new Date(document.getElementById('next-service-date').value),
+                    lastServiceDate: lastServiceDateValue ? new Date(lastServiceDateValue) : null,
+                    warrantyDate: warrantyDateValue ? new Date(warrantyDateValue) : null,
+                    nextServiceDate: nextServiceDateValue ? new Date(nextServiceDateValue) : null,
                     lastUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
@@ -227,8 +242,10 @@
                         alert('บันทึกข้อมูลเรียบร้อย!');
                         currentAcData = { ...currentAcData, ...updatedData };
                         displayData(currentAcData);
-                        startCountdown(updatedData.nextServiceDate);
-
+                        if (updatedData.nextServiceDate) {
+                            startCountdown(updatedData.nextServiceDate);
+                        }
+                        
                         editModeForm.style.display = 'none';
                         viewModeContent.style.display = 'block';
                         adminSection.style.display = 'block';
