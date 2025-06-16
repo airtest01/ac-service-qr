@@ -64,7 +64,7 @@
                     <div class="info-item" id="warranty-info"><p>ประกันงานซ่อมหมดอายุ: กำลังโหลด...</p></div>
                 </div>
             </div>
-            <div class="admin-section">
+            <div class="admin-section" style="display: none;">
                 <h3>สำหรับเจ้าหน้าที่</h3>
                 <div class="login-form">
                     <input id="password-input" type="password" placeholder="รหัสผ่านสำหรับช่าง">
@@ -171,6 +171,7 @@
                             document.getElementById('countdown-timer').style.display = 'none';
                             document.querySelector('.countdown-subtitle').style.display = 'none';
                         }
+                        adminSection.style.display = 'block';
                     } else {
                         messageArea.innerText = 'ไม่พบข้อมูลของ QR Code นี้';
                         messageArea.style.display = 'block';
