@@ -32,7 +32,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     
     <script>
-        // --- 1. การตั้งค่า FIREBASE ---
         const firebaseConfig = {
           apiKey: "AIzaSyDaSUB2YOUhTcUXcvD7UkBHBfnD7VvihFI",
           authDomain: "airtest-a5426.firebaseapp.com",
@@ -45,12 +44,10 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // --- 2. เชื่อมโค้ดกับปุ่มและพื้นที่แสดงผล ---
         const generateBtn = document.getElementById('generate-btn');
         const qrcodeContainer = document.getElementById('qrcode-container');
         const resultUrlElement = document.getElementById('result-url');
 
-        // --- 3. สั่งให้ปุ่มทำงานเมื่อถูกคลิก ---
         generateBtn.addEventListener('click', () => {
             generateBtn.disabled = true;
             generateBtn.innerText = 'กำลังสร้าง...';
@@ -63,11 +60,10 @@
             .then((docRef) => {
                 console.log("สร้างเอกสารใหม่สำเร็จ ID คือ: ", docRef.id);
                 
-                // --- ⭐⭐⭐ จุดที่แก้ไขล่าสุด! ⭐⭐⭐ ---
-                // อัปเดตเป็น URL จริงจาก Netlify
-                const baseUrl = 'https://velvety-sable-aa7d95.netlify.app';
-                // แก้เป็น index.html ให้ตรงกับชื่อไฟล์จริง
-                const fullUrl = `${baseUrl}/index.html?id=${docRef.id}`; 
+                // --- ⭐⭐⭐ จุดที่แก้ไขล่าสุด! ⭐⭐⭐
+                // อัปเดตเป็น URL จริงที่ถูกต้องของคุณ
+                const baseUrl = 'https://airtest01.netlify.app';
+                const fullUrl = `${baseUrl}/index.html?id=${docRef.id}`;
                 
                 new QRCode(qrcodeContainer, {
                     text: fullUrl,
