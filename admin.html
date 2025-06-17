@@ -51,6 +51,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     
     <script>
+        // ใช้ "กุญแจ" ที่ถูกต้องของโปรเจกต์ airtest-a5426
         const firebaseConfig = {
           apiKey: "AIzaSyDaSUB2YOUhTcUXcvD7UkBHBfnD7VvihFI",
           authDomain: "airtest-a5426.firebaseapp.com",
@@ -68,7 +69,6 @@
         const resultUrlElement = document.getElementById('result-url');
         const shopSelect = document.getElementById('shop-select');
 
-        // --- ดึงข้อมูลร้านค้าจริงจาก Firebase เมื่อเปิดหน้าเว็บ ---
         window.onload = () => {
             db.collection('Shops').get().then((querySnapshot) => {
                 shopSelect.innerHTML = '<option value="">-- กรุณาเลือกร้าน --</option>';
@@ -87,7 +87,6 @@
             });
         };
 
-        // --- การทำงานของปุ่ม "สร้าง QR Code" ---
         generateBtn.addEventListener('click', () => {
             const selectedShopId = shopSelect.value;
             if (!selectedShopId) {
