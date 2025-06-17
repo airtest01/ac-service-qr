@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - สร้าง QR Code</title>
-    
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-
+    <title>Admin - สร้าง QR Code (Test Mode)</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;700&display=swap');
         body { font-family: 'Kanit', sans-serif; background-color: #F7FAFC; display: flex; justify-content: center; align-items: center; min-height: 100vh; text-align: center; margin: 20px; }
@@ -14,15 +11,7 @@
         h1 { color: #2D3748; margin-bottom: 30px; }
         .form-group { margin-bottom: 20px; text-align: left; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #4A5568; }
-        select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #E2E8F0;
-            border-radius: 8px;
-            font-size: 1em;
-            font-family: 'Kanit', sans-serif;
-            box-sizing: border-box;
-        }
+        select { width: 100%; padding: 10px; border: 1px solid #E2E8F0; border-radius: 8px; font-size: 1em; font-family: 'Kanit', sans-serif; box-sizing: border-box; }
         #generate-btn { background: #00796B; color: white; border: none; padding: 15px 30px; font-size: 1.1em; font-family: 'Kanit', sans-serif; border-radius: 10px; cursor: pointer; transition: all 0.3s ease; width: 100%; }
         #generate-btn:hover { background: #004D40; transform: translateY(-3px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         #generate-btn:disabled { background-color: #cccccc; cursor: not-allowed; }
@@ -31,59 +20,40 @@
     </style>
 </head>
 <body>
-
     <div class="admin-panel">
         <h1>ระบบสร้าง QR Code</h1>
         <div class="form-group">
             <label for="shop-select">เลือกร้านค้า:</label>
             <select id="shop-select">
-                <option value="">กำลังโหลดรายชื่อร้าน...</option>
+                <option value="">-- กรุณาเลือกร้าน --</option>
             </select>
         </div>
-        
         <p>กดปุ่มเพื่อสร้าง QR Code สำหรับลูกค้าร้านที่เลือก</p>
-        <button id="generate-btn" disabled>เลือกร้านก่อน</button>
+        <button id="generate-btn">สร้าง QR Code ใหม่</button>
         <div id="qrcode-container"></div>
         <p id="result-url"></p>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    
-    <script>
-        // ใช้ "กุญแจ" ที่ถูกต้องของโปรเจกต์ airtest-a5426
-        const firebaseConfig = {
-          apiKey: "AIzaSyDaSUB2YOUhTcUXcvD7UkBHBfnD7VvihFI",
-          authDomain: "airtest-a5426.firebaseapp.com",
-          projectId: "airtest-a5426",
-          storageBucket: "airtest-a5426.appspot.com",
-          messagingSenderId: "960699518397",
-          appId: "1:960699518397:web:cf32a0c1694076986ad6d4",
-          measurementId: "G-K0FLKYTMZ9"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
+    <script>
         const generateBtn = document.getElementById('generate-btn');
         const qrcodeContainer = document.getElementById('qrcode-container');
         const resultUrlElement = document.getElementById('result-url');
         const shopSelect = document.getElementById('shop-select');
 
         window.onload = () => {
-            db.collection('Shops').get().then((querySnapshot) => {
-                shopSelect.innerHTML = '<option value="">-- กรุณาเลือกร้าน --</option>';
-                querySnapshot.forEach((doc) => {
-                    const shopData = doc.data();
-                    const option = document.createElement('option');
-                    option.value = doc.id;
-                    option.textContent = shopData.shopName;
-                    shopSelect.appendChild(option);
-                });
-                 generateBtn.disabled = false;
-                 generateBtn.innerText = 'สร้าง QR Code ใหม่';
-            }).catch((error) => {
-                console.error("เกิดข้อผิดพลาดในการดึงข้อมูลร้านค้า: ", error);
-                shopSelect.innerHTML = '<option value="">เกิดข้อผิดพลาด</option>';
+            const fakeShops = [
+                { id: 'k3MMdoZIRrqtpNu7kOJg', shopName: 'เฟื่องฟูAIR (ทดสอบ)' }
+            ];
+            
+            shopSelect.innerHTML = '<option value="">-- กรุณาเลือกร้าน --</option>'; 
+            
+            fakeShops.forEach((shop) => {
+                const option = document.createElement('option');
+                option.value = shop.id;
+                option.textContent = shop.shopName;
+                shopSelect.appendChild(option);
             });
         };
 
@@ -93,32 +63,14 @@
                 alert("กรุณาเลือกร้านค้าก่อนครับ!");
                 return;
             }
-
-            generateBtn.disabled = true;
-            generateBtn.innerText = 'กำลังสร้าง...';
-            qrcodeContainer.innerHTML = '';
-            resultUrlElement.innerText = '';
+            qrcodeContainer.innerHTML = ''; 
+            const fakeAcId = 'TEST_AC_ID_' + Math.random().toString(36).substr(2, 9);
+            const baseUrl = 'https://airtest01.netlify.app';
+            const fullUrl = `${baseUrl}/index.html?shopId=${selectedShopId}&id=${fakeAcId}`;
             
-            db.collection('Shops').doc(selectedShopId).collection('AirConditioners').add({
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            })
-            .then((docRef) => {
-                const baseUrl = 'https://airtest01.netlify.app';
-                const fullUrl = `${baseUrl}/index.html?shopId=${selectedShopId}&id=${docRef.id}`;
-                
-                new QRCode(qrcodeContainer, { text: fullUrl, width: 256, height: 256 });
-                resultUrlElement.innerText = `URL: ${fullUrl}`;
-                generateBtn.disabled = false;
-                generateBtn.innerText = 'สร้าง QR Code ใหม่';
-            })
-            .catch((error) => {
-                console.error("เกิดข้อผิดพลาด: ", error);
-                alert("เกิดข้อผิดพลาดในการสร้าง QR Code!");
-                generateBtn.disabled = false;
-                generateBtn.innerText = 'สร้าง QR Code ใหม่';
-            });
+            new QRCode(qrcodeContainer, { text: fullUrl, width: 256, height: 256 });
+            resultUrlElement.innerText = `URL (ทดสอบ): ${fullUrl}`;
         });
     </script>
-
 </body>
 </html>
