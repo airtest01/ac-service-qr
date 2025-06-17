@@ -71,23 +71,34 @@
 
         // --- ⭐⭐⭐ โค้ดใหม่: ดึงข้อมูลร้านค้าเมื่อเปิดหน้าเว็บ ---
         window.onload = () => {
+            console.log("เริ่มการทำงานของ window.onload"); // 1. เช็คว่าฟังก์ชันเริ่มทำงานไหม
+            
             db.collection('Shops').get().then((querySnapshot) => {
-                shopSelect.innerHTML = '<option value="">-- กรุณาเลือกร้าน --</option>'; // ล้างตัวเลือกเก่า
+                console.log("ดึงข้อมูลสำเร็จ! จำนวนร้านที่พบ:", querySnapshot.size); // 2. เช็คว่าเจอข้อมูลกี่ร้าน
+
+                shopSelect.innerHTML = '<option value="">-- กรุณาเลือกร้าน --</option>'; 
+                
                 querySnapshot.forEach((doc) => {
-                    // สร้างตัวเลือก (option) สำหรับแต่ละร้านที่เจอ
                     const shopData = doc.data();
+                    console.log("กำลังสร้างตัวเลือกสำหรับร้าน:", shopData.shopName); // 3. เช็คว่าโค้ดวิ่งเข้ามาใน loop นี้ไหม
+                    
                     const option = document.createElement('option');
-                    option.value = doc.id; // value คือ ID ของร้าน
-                    option.textContent = shopData.shopName; // text คือ ชื่อร้าน
+                    option.value = doc.id;
+                    option.textContent = shopData.shopName;
                     shopSelect.appendChild(option);
                 });
+
                  generateBtn.disabled = false;
                  generateBtn.innerText = 'สร้าง QR Code ใหม่';
+
             }).catch((error) => {
-                console.error("Error getting shops: ", error);
+                console.error("เกิดข้อผิดพลาดในการดึงข้อมูลร้านค้า: ", error); // 4. เช็คว่ามี error หรือไม่
                 shopSelect.innerHTML = '<option value="">เกิดข้อผิดพลาด</option>';
             });
         };
+
+        // ... (โค้ดส่วน generateBtn.addEventListener เหมือนเดิม) ...
+    </script>
 
         // --- ⭐⭐⭐ โค้ดใหม่: การทำงานของปุ่ม "สร้าง QR Code" ที่เปลี่ยนไป ---
         generateBtn.addEventListener('click', () => {
