@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - สร้าง QR Code (Manual ID)</title>
+    <title>Admin - สร้าง QR Code</title>
     
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
@@ -12,20 +12,8 @@
         body { font-family: 'Kanit', sans-serif; background-color: #F7FAFC; display: flex; justify-content: center; align-items: center; min-height: 100vh; text-align: center; margin: 20px; }
         .admin-panel { background-color: #FFFFFF; padding: 40px; border-radius: 20px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1); width: 100%; max-width: 450px; }
         h1 { color: #2D3748; margin-bottom: 30px; }
-        .form-group { margin-bottom: 20px; text-align: left; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #4A5568; }
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #E2E8F0;
-            border-radius: 8px;
-            font-size: 1em;
-            font-family: 'Kanit', sans-serif;
-            box-sizing: border-box;
-        }
-        #generate-btn { background: #00796B; color: white; border: none; padding: 15px 30px; font-size: 1.1em; font-family: 'Kanit', sans-serif; border-radius: 10px; cursor: pointer; transition: all 0.3s ease; width: 100%; }
+        #generate-btn { background: #00796B; color: white; border: none; padding: 15px 30px; font-size: 1.1em; font-family: 'Kanit', sans-serif; border-radius: 10px; cursor: pointer; transition: all 0.3s ease; }
         #generate-btn:hover { background: #004D40; transform: translateY(-3px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        #generate-btn:disabled { background-color: #cccccc; cursor: not-allowed; }
         #qrcode-container { margin-top: 30px; padding: 20px; min-height: 256px; display: flex; justify-content: center; align-items: center; }
         #result-url { margin-top: 15px; font-size: 0.9em; color: #718096; word-wrap: break-word; }
     </style>
@@ -34,12 +22,7 @@
 
     <div class="admin-panel">
         <h1>ระบบสร้าง QR Code</h1>
-        <div class="form-group">
-            <label for="shop-id-input">วาง Shop ID ที่นี่:</label>
-            <input type="text" id="shop-id-input" placeholder="วาง ID ของร้านค้าจาก Firebase">
-        </div>
-        
-        <p>กดปุ่มเพื่อสร้าง QR Code สำหรับลูกค้าร้านนี้</p>
+        <p>กดปุ่มเพื่อสร้าง QR Code สำหรับแอร์เครื่องใหม่</p>
         <button id="generate-btn">สร้าง QR Code ใหม่</button>
         <div id="qrcode-container"></div>
         <p id="result-url"></p>
@@ -49,6 +32,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     
     <script>
+        // --- 1. การตั้งค่า FIREBASE ---
         const firebaseConfig = {
           apiKey: "AIzaSyDaSUB2YOUhTcUXcvD7UkBHBfnD7VvihFI",
           authDomain: "airtest-a5426.firebaseapp.com",
@@ -61,37 +45,40 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        // --- 2. เชื่อมโค้ดกับปุ่มและพื้นที่แสดงผล ---
         const generateBtn = document.getElementById('generate-btn');
         const qrcodeContainer = document.getElementById('qrcode-container');
         const resultUrlElement = document.getElementById('result-url');
-        const shopIdInput = document.getElementById('shop-id-input');
 
+        // --- 3. สั่งให้ปุ่มทำงานเมื่อถูกคลิก ---
         generateBtn.addEventListener('click', () => {
-            const selectedShopId = shopIdInput.value.trim();
-            if (!selectedShopId) {
-                alert("กรุณาวาง ID ของร้านค้าก่อนครับ!");
-                return;
-            }
-
             generateBtn.disabled = true;
             generateBtn.innerText = 'กำลังสร้าง...';
             qrcodeContainer.innerHTML = '';
             resultUrlElement.innerText = '';
             
-            db.collection('Shops').doc(selectedShopId).collection('AirConditioners').add({
+            db.collection('AirConditioners').add({
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             })
             .then((docRef) => {
-                const baseUrl = 'https://airtest01.netlify.app';
+                console.log("สร้างเอกสารใหม่สำเร็จ ID คือ: ", docRef.id);
                 
-                // --- ⭐⭐⭐ จุดที่แก้ไข! ⭐⭐⭐
-                // เปลี่ยนวิธีการสร้าง URL เป็นแบบที่แน่นอนและปลอดภัยที่สุด
-                const fullUrl = baseUrl + '/index.html?shopId=' + selectedShopId + '&id=' + docRef.id;
+                // --- ⭐⭐⭐ จุดที่แก้ไขล่าสุด! ⭐⭐⭐ ---
+                // อัปเดตเป็น URL จริงจาก Netlify
+                const baseUrl = 'https://velvety-sable-aa7d95.netlify.app';
+                // แก้เป็น index.html ให้ตรงกับชื่อไฟล์จริง
+                const fullUrl = `${baseUrl}/index.html?id=${docRef.id}`; 
                 
-                new QRCode(qrcodeContainer, { text: fullUrl, width: 256, height: 256 });
-                
-                resultUrlElement.innerText = 'URL: ' + fullUrl;
+                new QRCode(qrcodeContainer, {
+                    text: fullUrl,
+                    width: 256,
+                    height: 256,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
 
+                resultUrlElement.innerText = `URL: ${fullUrl}`;
                 generateBtn.disabled = false;
                 generateBtn.innerText = 'สร้าง QR Code ใหม่';
             })
