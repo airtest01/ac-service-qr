@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - สร้าง QR Code</title>
-    
+    <title>Admin - สร้าง QR Code (Manual ID)</title>
+
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
     <style>
@@ -14,7 +14,7 @@
         h1 { color: #2D3748; margin-bottom: 30px; }
         .form-group { margin-bottom: 20px; text-align: left; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #4A5568; }
-        select {
+        input[type="text"] {
             width: 100%;
             padding: 10px;
             border: 1px solid #E2E8F0;
@@ -35,23 +35,20 @@
     <div class="admin-panel">
         <h1>ระบบสร้าง QR Code</h1>
         <div class="form-group">
-            <label for="shop-select">เลือกร้านค้า:</label>
-            <select id="shop-select">
-                <option value="">กำลังโหลดรายชื่อร้าน...</option>
-            </select>
+            <label for="shop-id-input">วาง Shop ID ที่นี่:</label>
+            <input type="text" id="shop-id-input" placeholder="วาง ID ของร้านค้าจาก Firebase">
         </div>
-        
-        <p>กดปุ่มเพื่อสร้าง QR Code สำหรับลูกค้าร้านที่เลือก</p>
-        <button id="generate-btn" disabled>เลือกร้านก่อน</button>
+
+        <p>กดปุ่มเพื่อสร้าง QR Code สำหรับลูกค้าร้านนี้</p>
+        <button id="generate-btn">สร้าง QR Code ใหม่</button>
         <div id="qrcode-container"></div>
         <p id="result-url"></p>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    
+
     <script>
-        // ใช้ "กุญแจ" ที่ถูกต้องของโปรเจกต์ airtest-a5426
         const firebaseConfig = {
           apiKey: "AIzaSyDaSUB2YOUhTcUXcvD7UkBHBfnD7VvihFI",
           authDomain: "airtest-a5426.firebaseapp.com",
@@ -67,32 +64,12 @@
         const generateBtn = document.getElementById('generate-btn');
         const qrcodeContainer = document.getElementById('qrcode-container');
         const resultUrlElement = document.getElementById('result-url');
-        const shopSelect = document.getElementById('shop-select');
+        const shopIdInput = document.getElementById('shop-id-input');
 
-        // ดึงข้อมูลร้านค้าจริงจาก Firebase
-        window.onload = () => {
-            db.collection('Shops').get().then((querySnapshot) => {
-                shopSelect.innerHTML = '<option value="">-- กรุณาเลือกร้าน --</option>';
-                querySnapshot.forEach((doc) => {
-                    const shopData = doc.data();
-                    const option = document.createElement('option');
-                    option.value = doc.id;
-                    option.textContent = shopData.shopName;
-                    shopSelect.appendChild(option);
-                });
-                 generateBtn.disabled = false;
-                 generateBtn.innerText = 'สร้าง QR Code ใหม่';
-            }).catch((error) => {
-                console.error("เกิดข้อผิดพลาดในการดึงข้อมูลร้านค้า: ", error);
-                shopSelect.innerHTML = '<option value="">เกิดข้อผิดพลาด</option>';
-            });
-        };
-
-        // สร้าง QR Code และสร้างข้อมูลจริงใน Firebase
         generateBtn.addEventListener('click', () => {
-            const selectedShopId = shopSelect.value;
+            const selectedShopId = shopIdInput.value.trim(); // .trim() เพื่อตัดช่องว่าง
             if (!selectedShopId) {
-                alert("กรุณาเลือกร้านค้าก่อนครับ!");
+                alert("กรุณาวาง ID ของร้านค้าก่อนครับ!");
                 return;
             }
 
@@ -100,15 +77,14 @@
             generateBtn.innerText = 'กำลังสร้าง...';
             qrcodeContainer.innerHTML = '';
             resultUrlElement.innerText = '';
-            
-            // สร้างเอกสารใน Sub-collection "AirConditioners" ของร้านที่เลือก
+
             db.collection('Shops').doc(selectedShopId).collection('AirConditioners').add({
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             })
             .then((docRef) => {
                 const baseUrl = 'https://airtest01.netlify.app';
-                const fullUrl = `${baseUrl}/index.html?shopId=${selectedShopId}&id=${docRef.id}`;
-                
+                const fullUrl = `<span class="math-inline">\{baseUrl\}/index\.html?shopId\=</span>{selectedShopId}&id=${docRef.id}`;
+
                 new QRCode(qrcodeContainer, { text: fullUrl, width: 256, height: 256 });
                 resultUrlElement.innerText = `URL: ${fullUrl}`;
                 generateBtn.disabled = false;
