@@ -13,15 +13,11 @@
         }
         body { font-family: 'Kanit', sans-serif; background-color: var(--background-color); margin: 0; padding: 20px; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
         .container { background-color: var(--card-color); width: 100%; max-width: 420px; border-radius: 24px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07); overflow: hidden; }
-
-        /* --- ⭐⭐⭐ จุดที่แก้ไขล่าสุด! (ปรับขนาดโลโก้และลบ H1) ⭐⭐⭐ --- */
+        
+        /* --- ⭐⭐⭐ จุดที่แก้ไขล่าสุด! ⭐⭐⭐ --- */
         .shop-header { padding: 30px 25px; border-bottom: 1px solid #E8F0F2; text-align: center; }
-        .shop-logo {
-            width: 280px; /* ปรับขนาดโลโก้ให้ใหญ่ขึ้น */
-            height: auto; /* รักษาสัดส่วนของภาพ */
-            margin-bottom: 20px; /* ปรับระยะห่างด้านล่างโลโก้ */
-        }
-        .shop-header p { margin: 0; font-size: 2.2em; font-weight: 800; color: var(--primary-color); }
+        .shop-header h1 { margin: 0 0 10px 0; font-size: 2.5em; /* เพิ่มขนาดชื่อร้าน */ font-weight: 700; color: var(--primary-text); line-height: 1.2; }
+        .shop-header p { margin: 0; font-size: 2.2em; /* เพิ่มขนาดเบอร์โทร */ font-weight: 800; color: var(--primary-color); }
         /* --- จบส่วนที่แก้ไข --- */
 
         .countdown-highlight { background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); color: var(--primary-color); padding: 25px; text-align: center; min-height: 150px; }
@@ -54,7 +50,7 @@
 <body>
     <div class="container">
         <header class="shop-header">
-            <img src="25.png" alt="โลโก้ร้านเฟื่องฟูAIR" class="shop-logo">
+            <h1>ณเดชAIR</h1>
             <p>ช่างหล่อ 089-1234567</p>
         </header>
         <div class="countdown-highlight">
