@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - สร้าง QR Code (Manual ID)</title>
-
+    
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
     <style>
@@ -38,7 +38,7 @@
             <label for="shop-id-input">วาง Shop ID ที่นี่:</label>
             <input type="text" id="shop-id-input" placeholder="วาง ID ของร้านค้าจาก Firebase">
         </div>
-
+        
         <p>กดปุ่มเพื่อสร้าง QR Code สำหรับลูกค้าร้านนี้</p>
         <button id="generate-btn">สร้าง QR Code ใหม่</button>
         <div id="qrcode-container"></div>
@@ -47,7 +47,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
+    
     <script>
         const firebaseConfig = {
           apiKey: "AIzaSyDaSUB2YOUhTcUXcvD7UkBHBfnD7VvihFI",
@@ -67,7 +67,7 @@
         const shopIdInput = document.getElementById('shop-id-input');
 
         generateBtn.addEventListener('click', () => {
-            const selectedShopId = shopIdInput.value.trim(); // .trim() เพื่อตัดช่องว่าง
+            const selectedShopId = shopIdInput.value.trim();
             if (!selectedShopId) {
                 alert("กรุณาวาง ID ของร้านค้าก่อนครับ!");
                 return;
@@ -77,16 +77,21 @@
             generateBtn.innerText = 'กำลังสร้าง...';
             qrcodeContainer.innerHTML = '';
             resultUrlElement.innerText = '';
-
+            
             db.collection('Shops').doc(selectedShopId).collection('AirConditioners').add({
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             })
             .then((docRef) => {
                 const baseUrl = 'https://airtest01.netlify.app';
-                const fullUrl = `<span class="math-inline">\{baseUrl\}/index\.html?shopId\=</span>{selectedShopId}&id=${docRef.id}`;
-
+                
+                // --- ⭐⭐⭐ จุดที่แก้ไข! ⭐⭐⭐
+                // เปลี่ยนวิธีการสร้าง URL เป็นแบบที่แน่นอนและปลอดภัยที่สุด
+                const fullUrl = baseUrl + '/index.html?shopId=' + selectedShopId + '&id=' + docRef.id;
+                
                 new QRCode(qrcodeContainer, { text: fullUrl, width: 256, height: 256 });
-                resultUrlElement.innerText = `URL: ${fullUrl}`;
+                
+                resultUrlElement.innerText = 'URL: ' + fullUrl;
+
                 generateBtn.disabled = false;
                 generateBtn.innerText = 'สร้าง QR Code ใหม่';
             })
